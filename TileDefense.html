@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Tile Defense</title>
+  <link href="./style.css" rel="stylesheet">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🙂</text></svg>">
+</head>
+
+<body>
+  <canvas id="canv"></canvas>
+
+
+  <script type="module">
+    "use strict"
+    import { getCanvas } from "./engine/scripts.js"
+    import Time from "./engine/Time.js"
+    import Input from "./engine/Input.js"
+
+
+    import Game from "./engine/Game.js"
+    import MainScene from "./tile_defense/MainScene.js"
+    import DeathScene from "./tile_defense/DeathScene.js"
+
+    Input.attach(document);
+
+    let { canvas, ctx } = getCanvas();
+
+
+    Game.scenes.push(new MainScene());
+    Game.scenes.push(new DeathScene());
+    
+    Game.changeScene(0)
+    
+    
+    //Setup the camera
+    Game.cameraX = 0;
+    Game.cameraY = 0;
+    Game.cameraWidth = 400;
+    Game.cameraULX = -200;
+    Game.cameraULY = -200;
+
+
+    function tick() {
+
+      //Change the scene if a component requested a scene change through
+      //Game.changeScene(x) during the previous tick
+      Game.updateScene();
+
+      //Update the input. Spefically, update which keys went down or up in the last frame
+      Input.update();
+
+
+
+      Game.scene().update(ctx); //Update the scene, which updates all the game objects and call their components update() function
+
+      //Setup the game camera
+      Game.scene().draw(ctx); //Draw the scene to the screen
+
+
+      Game.scene().remove(); //Remove any game objects whose markForDelete was set to true in the previous frame
+      Time.timePassed += Time.secondsBetweenFrame; //Update the total time elapsed in the game
+    }
+
+
+
+    setInterval(tick, Time.millisecondsBetweenFrames)
+
+  </script>
+</body>
+
+</html>
